@@ -23,13 +23,14 @@ from System.Collections.Generic import List
 class Webview:
     logger = log.get(log.LIB_NAME)
 
-    def __init__(self, form, config: Config, workers: int):
+    def __init__(self, form, config: Config, workers: int, state):
         self.config = config
         self.scheme = LIB_NAME
         self.webview = WebView2()
         self.thread_pool = ThreadPoolExecutor(max_workers=workers)
         self.logger.info(f"Running with {workers} workers")
         self.invoke_results = {}
+        self.state = state
         
         
         self.form = form
@@ -212,7 +213,7 @@ class Webview:
     def process_command(self, command, params, request_id):
         """Process the invoke in a different thread"""
         try:
-            response = Invoker.process(command=command, params=params)
+            response = Invoker.process(command=command, params=params, state=self.state)
             self.invoke_results[request_id] = response
             
 
@@ -224,7 +225,7 @@ class Webview:
             self.logger.error(f"Failed to run invoke: {err}")
 
     def send_response(self, request_id):
-        """Envia a resposta do invoke_results para o cliente"""
+        """Send the response of invoke_results to the client"""
         try:
             if request_id in self.invoke_results:
                 result = self.invoke_results.pop(request_id)

@@ -10,7 +10,7 @@ from System.Windows.Forms import Form, Application, FormBorderStyle
 class WinForms(Form):
     logger = log.get(log.LIB_NAME)
 
-    def __init__(self, config: Config, workers: int):
+    def __init__(self, config: Config, workers: int, state):
         super().__init__()
         self.uid = config.identifier
 
@@ -39,7 +39,7 @@ class WinForms(Form):
             self.FormBorderStyle = FormBorderStyle.FixedSingle
         self.logger.info(f"WinForms Window Resizable: {config.window.resizable}")
         
-        self.browser = webview.Webview(self, config, workers)
+        self.browser = webview.Webview(self, config, workers, state)
         self.FormClosed += self.on_exit
 
     def on_exit(self, *_):
@@ -50,11 +50,11 @@ class WinForms(Form):
 
         self.logger.info("WinForms process terminated")
 
-def initialize(config: Config, workers: int):
+def initialize(config: Config, workers: int, state):
     """Starts the application"""
     logger = log.get(log.LIB_NAME)
 
-    form = WinForms(config, workers)
+    form = WinForms(config, workers, state)
     form.Show()
 
     app = Application

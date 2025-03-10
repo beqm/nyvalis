@@ -21,6 +21,7 @@ class Builder:
     config: Config
     logger = log.get(log.LIB_NAME)
     _workers = 2
+    _state = None
 
     @classmethod
     def default(cls):
@@ -39,8 +40,12 @@ class Builder:
             Builder.config = Config.read(conf, "utf-8")
             return Builder()
         except NyvalisConfigError as err:
-            print("hello")
             stdout.error(f"{err}", exit=True)
+
+    @classmethod
+    def state(cls, object):
+        cls._state = object
+        return Builder
     
     @classmethod
     def run(cls) -> None:
@@ -57,7 +62,7 @@ class Builder:
             Application.EnableVisualStyles()
             Application.SetCompatibleTextRenderingDefault(False)
 
-            thread = Thread(ThreadStart(lambda: winforms.initialize(cls.config, cls._workers)))
+            thread = Thread(ThreadStart(lambda: winforms.initialize(cls.config, cls._workers, cls._state)))
             thread.SetApartmentState(ApartmentState.STA)
             thread.Start()
             thread.Join()

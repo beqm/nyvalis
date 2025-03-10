@@ -1,6 +1,6 @@
 {
     "name": "nyvalis",
-    "version": "0.1.0",
+    "version": "0.1.3",
     "description": "Scripts for using poetry faster",
     "scripts": {
       "build": "poetry build",
