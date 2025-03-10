@@ -1,4 +1,5 @@
 import json
+import inspect
 from .models import Command
 from typing import Callable, Dict
 from nyvalis.tools import stdout, log
@@ -17,10 +18,15 @@ class Invoker:
         cls.commands[name] = Command(name=func.__name__, allowed=False, func=func)
 
     @classmethod
-    def process(cls, command: Command, params):
+    def process(cls, command: Command, params, state):
         try:
-            result = command.func(**params)
-            response = json.dumps({"data": str(result), "error": None})
+            signature = inspect.signature(command.func)
+            if "state" in signature.parameters:
+                result = command.func(state, **params)
+            else:
+                result = command.func(**params)
+
+            response = json.dumps({"data": result, "error": None})
             return response
         except Exception as err:
             cls.logger.error(err)
