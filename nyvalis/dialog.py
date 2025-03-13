@@ -17,7 +17,6 @@ class FileFilter:
 
 
 class Dialog:
-    __FOLDERS_FILTER = 'Folders'
     __FLAGS = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
     __winforms_assembly = Assembly.LoadWithPartialName('System.Windows.Forms')
 
@@ -45,7 +44,6 @@ class Dialog:
         dialog.InitialDirectory = path
 
         if directory:
-            dialog.Filter = Dialog.__FOLDERS_FILTER
             dialog.CheckFileExists = False
             dialog.DereferenceLinks = True
             dialog.AddExtension = False
