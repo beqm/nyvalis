@@ -1,4 +1,4 @@
-import { invoke } from "./core";
+import { invoke } from "./core.js";
 
 export {
     invoke
