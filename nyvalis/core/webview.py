@@ -96,12 +96,20 @@ class Webview:
         try:
             uri = event_args.Request.Uri
             parsed_uri = Uri(uri)
-            
+
             raw_path = parsed_uri.AbsolutePath
             path = raw_path[1:] if raw_path.startswith('/') else raw_path
-            
+
             base_dir = ROOT_PATH
-            full_path = (base_dir / self.config.build.dist_dir / path).resolve()
+            build_dir = base_dir / self.config.build.dist_dir
+
+            index_html = next(build_dir.rglob("index.html"), None)
+            if not index_html:
+                raise FileNotFoundError(f"No index.html found in {build_dir}")
+
+            assets_root = index_html.parent
+
+            full_path = (assets_root / path).resolve()
 
             if not str(full_path).startswith(str(base_dir)):
                 self.logger.warning(f"Permission denied: {full_path}")
@@ -110,14 +118,15 @@ class Webview:
             static_extensions = {'.js', '.css', '.png', '.jpg', '.svg', '.json', '.woff', '.woff2', '.ico'}
 
             if full_path.is_dir():
-                full_path = full_path / "index.html"
+                full_path = assets_root / "index.html"
             elif not full_path.exists():
                 if full_path.suffix in static_extensions:
                     raise FileNotFoundError(f"File not found: {full_path}")
-                full_path = base_dir / "index.html"
+
+                full_path = assets_root / "index.html"
+
             if not full_path.is_file():
                 raise FileNotFoundError(f"Not a file: {full_path}")
-
             mime_types = {
                 '.html': 'text/html',
                 '.js': 'application/javascript',
